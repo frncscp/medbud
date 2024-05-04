@@ -51,15 +51,13 @@ def transcribe_audio(audio_path, key, task="transcribe", return_timestamps=False
     except Exception as e:
         return high_demand_warning
     
-def audio_intake(mic, file_path, format):
+def audio_intake(mic, format):
     rec = mic.export().read()
     st.audio(rec)
-    #buffer = io.BytesIO(rec)
-    with tempfile.NamedTemporaryFile(suffix='.mp3', delete=False) as temp_audio:
+    with tempfile.NamedTemporaryFile(suffix=format, delete=False) as temp_audio:
         temp_audio.write(rec)
         temp_audio.seek(0)
     return temp_audio.name
-    #mic.export(file_path, format = format)
 
 def generate_random_string(length):
     characters = string.ascii_letters + string.digits
@@ -94,9 +92,9 @@ def groq_request(instruct, prompt, model, history = True):
                 for m in st.session_state.messages
                 ],
         model = model,
-        temperature = .3,
+        temperature = .35,
         max_tokens = 1024,
-        top_p = .7,
+        top_p = .75,
         stream=True,)
         response = st.write_stream(parse_groq_stream(stream))
         st.session_state.messages.append({"role": "assistant", "content": response})

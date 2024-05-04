@@ -14,7 +14,7 @@ st.title("Doctor Buddy")
 st.caption("Transcriptor de citas médicas")
 st.divider()
 
-format_ = "mp3"
+format_ = ".mp3"
 file_path = f'/app/temp.{format}'
 file_path_fixed = r"/app/test-files/consulta_artificial.wav"
 modelo = "google/gemma-1.1-7b-it"
@@ -26,8 +26,39 @@ use_groq = True
 #incluyendo los detalles de la consulta, el diagnóstico y las recomendaciones
 #de tratamiento proporcionadas por el médico: """
 
-groq_instruct = 'Genera un resumen de una cita médica en un solo párrafo como aparecería en la historia clínica de un paciente.'
-answer_instruct = 'Responde a la pregunta del usuario en base al historial de conversación'
+formato_medico = '''
+1. Datos de identificación como número de historia clínica, nombre, nacionalidad, fecha de nacimiento, teléfono, ocupación, estado civil, etc:
+2. Motivo de la consulta, citando textualmente al paciente entre comillas (siempre y cuando exista un motivo, de lo contrario, coloca "No Aplica."):
+3. Antecedentes de enfermedad actual:
+4. Antecedentes de interés como hábitos tóxicos, fisiológicos, enfermedades de infancia, heredofamiliares, etc:
+5. Anamnesis y exploración física:
+6. Diagnóstico:
+7. Órdenes médicas:
+8. Tratamiento farmacológico:
+9. Plan médico y planificación de cuidados:'''
+
+#groq_instruct = 'Genera un resumen de una cita médica en un solo pá como aparecería en la historia clínica de un paciente.'
+
+summary_instruct = f''''
+Genera un formato detallado de la conversación teniendo en cuenta las siguientes condiciones:
+
+- Todo lo que aparezca en el formato debe estar en el prompt dado por el usuario.
+- Si no hay información sobre uno de los puntos, coloca "No Aplica.", incluido en el motivo de la consulta.
+- Si el audio que se entrega no es una conversación con los puntos incluidos, devuelve el formato co todos los puntos solo con la respuesta "No Aplica."
+
+Este es el formato con los puntos:
+{formato_medico}'''
+
+answer_instruct = '''
+Responde a la pregunta del usuario en base al historial de conversación, 
+coloca entre comillas la parte de la conversación que estás usando para responder, de esta forma:
+
+<respuesta>
+<"cita de la conversación entre comillas">
+
+No puedes generar nada que no esté en el historial de conversación. 
+Las preguntas del usuario solo podran ser respondidas con el historial de conversación. 
+No te dirijas en primera persona.'''
 
 def main():
     init_chat_history()
@@ -43,20 +74,18 @@ def main():
         st.session_state['key'] = generate_random_string(key_lenght) #create new key
 
     if len(mic) > 0:
-        conv = audio_intake(mic, file_path, format_) #save file
+        conv = audio_intake(mic, format_) 
         with st.spinner("Transcribiendo el audio..."):
-            #raw_text = transcribe_audio(
-            #    file_path_fixed, st.session_state['key'], 'transcribe', False)
             raw_text = transcribe_audio(
                 conv, st.session_state['key'], 'transcribe', False)
             #False is for not showing timestamps on the transcription
-            st.session_state.messages.append({"role": "user", "content": f'La fecha de hoy es {datetime.now()}'})          
-            st.session_state.messages.append({"role": "user", "content": 'Usa esta conversación para responder las preguntas que se te van a hacer: ' + raw_text})
+            st.session_state.messages.append({"role": "system", "content": f'La fecha de hoy es {datetime.now()}'})          
+            st.session_state.messages.append({"role": "system", "content": 'Usa esta conversación para responder las preguntas que se te van a hacer: ' + raw_text})
 
         with st.spinner("Generando texto..."):
             if use_groq:
-                with st.chat_message("assistant", avatar = "👨‍⚕️"):
-                    generate(groq_instruct, raw_text, groq_model, st.session_state["key"], groq = True, history = False)
+                with st.chat_message("assistant", avatar = "👨‍⚕️"): 
+                    generate(summary_instruct, raw_text, groq_model, st.session_state["key"], groq = True, history = False)
                 prompt = st.chat_input("Pregunta algo sobre la cita: ")
                 if prompt:
                     st.session_state.messages.append({"role": "user", "content": prompt})
