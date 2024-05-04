@@ -26,7 +26,20 @@ use_groq = True
 #incluyendo los detalles de la consulta, el diagnóstico y las recomendaciones
 #de tratamiento proporcionadas por el médico: """
 
-groq_instruct = 'Genera un resumen de una cita médica en un solo párrafo como aparecería en la historia clínica de un paciente.'
+formato_medico = '''
+1. Datos de identificación como número de historia clínica, nombre, nacionalidad, fecha de nacimiento, teléfono, ocupación, estado civil, etc:
+2. Motivo de la consulta, citando textualmente al paciente entre comillas:
+3. Antecedentes de enfermedad actual:
+4. Antecedentes de interés como hábitos tóxicos, fisiológicos, enfermedades de infancia, heredofamiliares, etc:
+5. Anamnesis y exploración física:
+6. Diagnóstico:
+7. Órdenes médicas:
+8. Tratamiento farmacológico:
+9. Plan médico y planificación de cuidados:'''
+
+#groq_instruct = 'Genera un resumen de una cita médica en un solo pá como aparecería en la historia clínica de un paciente.'
+
+summary_instruct = f'Genera un resumen de la conversación en el siguiente formato: \n{formato_medico}'
 answer_instruct = 'Responde a la pregunta del usuario en base al historial de conversación'
 
 def main():
@@ -56,7 +69,7 @@ def main():
         with st.spinner("Generando texto..."):
             if use_groq:
                 with st.chat_message("assistant", avatar = "👨‍⚕️"):
-                    generate(groq_instruct, raw_text, groq_model, st.session_state["key"], groq = True, history = False)
+                    generate(summary_instruct, raw_text, groq_model, st.session_state["key"], groq = True, history = False)
                 prompt = st.chat_input("Pregunta algo sobre la cita: ")
                 if prompt:
                     st.session_state.messages.append({"role": "user", "content": prompt})
