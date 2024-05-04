@@ -1,0 +1,10 @@
+version: "3.1"
+
+services:
+  server:
+    container_name: streamlit
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app/
