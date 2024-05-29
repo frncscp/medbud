@@ -51,7 +51,7 @@ def transcribe_audio(audio_path, key, task="transcribe", return_timestamps=False
     #    return high_demand_warning
     with open(audio_path, "rb") as file:
         transcription = groq_client.audio.transcriptions.create(
-          file=(audiopath, file.read()),
+          file=(audio_path, file.read()),
           model="whisper-large-v3",
         )
     print(transcription.text)
