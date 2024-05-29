@@ -26,7 +26,7 @@ high_demand_warning = "Los servidores tienen alta demanda, espere un poco e inte
 def load_whisper_client():
     return Client("https://sanchit-gandhi-whisper-jax.hf.space/")
 
-whisper_client = load_whisper_client()
+#whisper_client = load_whisper_client()
 
 def reduce(text): #removes a lot of unnecesary spaces
     return text.replace("\n", "").replace("  ", " ")
@@ -35,20 +35,26 @@ def reduce(text): #removes a lot of unnecesary spaces
 #at most it saves values for 1 hour (3600s) and 100 at a time
 @st.cache_resource(ttl = 3600, max_entries = 100, show_spinner = False)
 def transcribe_audio(audio_path, key, task="transcribe", return_timestamps=False):
-    try:
-        #call API (works on demand, sometimes it doesn't transcribe)
-        api = whisper_client.submit(
-            audio_path,
-            task,
-            return_timestamps,
-            api_name="/predict_1",
+    #try:
+    #    #call API (works on demand, sometimes it doesn't transcribe)
+    #    api = whisper_client.submit(
+    #        audio_path,
+    #        task,
+    #        return_timestamps,
+    #        api_name="/predict_1",
+    #    )
+    #
+    #    transcription, _ = api.result()
+    #    return reduce(transcription)
+    #
+    #except Exception as e:
+    #    return high_demand_warning
+    with open(audio_path, "rb") as file:
+        transcription = groq_client.audio.transcriptions.create(
+          file=(audiopath, file.read()),
+          model="whisper-large-v3",
         )
-
-        transcription, _ = api.result()
-        return reduce(transcription)
-
-    except Exception as e:
-        return high_demand_warning
+    return transcription.text
     
 def audio_intake(mic, format):
     rec = mic.export().read()
