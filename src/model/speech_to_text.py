@@ -54,6 +54,7 @@ def transcribe_audio(audio_path, key, task="transcribe", return_timestamps=False
           file=(audiopath, file.read()),
           model="whisper-large-v3",
         )
+    print(transcription.text)
     return transcription.text
     
 def audio_intake(mic, format):
