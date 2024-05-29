@@ -49,13 +49,16 @@ def transcribe_audio(audio_path, key, task="transcribe", return_timestamps=False
     #
     #except Exception as e:
     #    return high_demand_warning
-    with open(audio_path, "rb") as file:
-        transcription = groq_client.audio.transcriptions.create(
-          file=(audio_path, file.read()),
-          model="whisper-large-v3",
-        )
-    print(transcription.text)
-    return transcription.text
+    API_URL = "https://api-inference.huggingface.co/models/openai/whisper-large-v3"
+    headers = {"Authorization": f"Bearer {hf_token}"}
+    
+    with open(audio_path, "rb") as f:
+        data = f.read()
+    response = requests.post(API_URL, headers=headers, data=data)
+    print(response.json())
+    return response.json()
+    
+    output = query("sample1.flac")
     
 def audio_intake(mic, format):
     rec = mic.export().read()
