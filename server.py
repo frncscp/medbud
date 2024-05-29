@@ -5,6 +5,11 @@ import os
 from datetime import datetime
 import tempfile
 
+
+from dotenv import load_dotenv
+load_dotenv()
+os.getenv('GROQ_API')
+
 st.set_page_config(
     page_title = 'Doctor Buddy',
     page_icon = "👨‍⚕️"
