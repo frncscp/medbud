@@ -51,7 +51,7 @@ def transcribe_audio(audio_path, key, task="transcribe", return_timestamps=False
     #except Exception as e:
     #    return high_demand_warning
 
-    pipe = pipeline("automatic-speech-recognition", model="openai/whisper-large-v3")
+    pipe = pipeline("automatic-speech-recognition", model="openai/whisper-tiny")
     return pipe(audio_path)['text']
     
 def audio_intake(mic, format):
