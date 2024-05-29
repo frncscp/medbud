@@ -1,4 +1,5 @@
 from gradio_client import Client, file
+from transformers import pipeline
 import streamlit as st
 import random
 import string
@@ -49,16 +50,9 @@ def transcribe_audio(audio_path, key, task="transcribe", return_timestamps=False
     #
     #except Exception as e:
     #    return high_demand_warning
-    API_URL = "https://api-inference.huggingface.co/models/openai/whisper-large-v3"
-    headers = {"Authorization": f"Bearer {hf_token}"}
-    
-    with open(audio_path, "rb") as f:
-        data = f.read()
-    response = requests.post(API_URL, headers=headers, data=data)
-    print(response.json())
-    return response.json()
-    
-    output = query("sample1.flac")
+
+    pipe = pipeline("automatic-speech-recognition", model="openai/whisper-large-v3")
+    return pipe(audio_path)['text']
     
 def audio_intake(mic, format):
     rec = mic.export().read()
