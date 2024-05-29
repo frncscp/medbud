@@ -12,6 +12,7 @@ import tempfile
 load_dotenv()
 groq_api = os.getenv('GROQ_API')
 hf_token = os.getenv('HF_TOKEN')
+print(groq_api)
 
 groq_client = Groq(
     api_key=groq_api,
