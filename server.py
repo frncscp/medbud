@@ -67,6 +67,7 @@ def main():
 
     if not st.session_state.get('key'):
         st.session_state['key'] = None #instantiate
+    
     mic = audiorecorder(start_prompt="Empezar Grabación", 
     stop_prompt="Parar Grabación", pause_prompt="Pausar Grabación", key=None)
     
@@ -78,6 +79,7 @@ def main():
         with st.spinner("Transcribiendo el audio..."):
             raw_text = transcribe_audio(
                 conv, st.session_state['key'], 'transcribe', False)
+            print(raw_text)
             #False is for not showing timestamps on the transcription
             st.session_state.messages.append({"role": "system", "content": f'La fecha de hoy es {datetime.now()}'})          
             st.session_state.messages.append({"role": "system", "content": 'Usa esta conversación para responder las preguntas que se te van a hacer: ' + raw_text})
