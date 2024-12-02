@@ -1,5 +1,4 @@
 from gradio_client import Client, file, handle_file
-from transformers import pipeline
 import streamlit as st
 import random
 import string
