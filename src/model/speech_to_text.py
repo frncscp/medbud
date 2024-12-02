@@ -1,4 +1,4 @@
-from gradio_client import Client, file
+from gradio_client import Client, file, handle_file
 from transformers import pipeline
 import streamlit as st
 import random
@@ -25,9 +25,9 @@ high_demand_warning = "Los servidores tienen alta demanda, espere un poco e inte
 
 @st.cache_resource(show_spinner = False)
 def load_whisper_client():
-    return Client("https://sanchit-gandhi-whisper-jax.hf.space/")
+    return Client("hf-audio/whisper-large-v3-turbo")
 
-#whisper_client = load_whisper_client()
+whisper_client = load_whisper_client()
 
 def reduce(text): #removes a lot of unnecesary spaces
     return text.replace("\n", "").replace("  ", " ")
@@ -51,8 +51,13 @@ def transcribe_audio(audio_path, key, task="transcribe", return_timestamps=False
     #except Exception as e:
     #    return high_demand_warning
 
-    pipe = pipeline("automatic-speech-recognition", model="openai/whisper-tiny")
-    return pipe(audio_path)['text']
+    #pipe = pipeline("automatic-speech-recognition", model="openai/whisper-tiny")
+    #return pipe(audio_path)['text']
+    result = whisper_client.predict(
+    inputs=handle_file(audio_path),
+    task="transcribe",
+    api_name="/predict")
+    return result
     
 def audio_intake(mic, format):
     rec = mic.export().read()
