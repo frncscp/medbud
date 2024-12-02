@@ -16,3 +16,5 @@ Este asistente puede:
     - Tratamiento farmacológico.
     - Plan médico y planificaicón de cuidados.
 - Responder preguntas sobre la conversación que no aparezcan en el resumen.
+
+#### El proyecto depende de APIs de terceros, por lo que un error a la hora de usarlo seguramente provenga del límite de uso de las mismas (o la continuidad de sus existencias). 
